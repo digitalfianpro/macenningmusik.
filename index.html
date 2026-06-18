@@ -112,7 +112,7 @@
                      class="w-32 h-32 rounded-full glow-logo object-cover border-4 border-brand-500 shadow-2xl">
             </div>
             <h1 class="text-3xl font-extrabold text-white tracking-tight">Macenning<span class="text-brand-500">Musik</span></h1>
-            <p class="text-xs text-slate-400 mt-2 font-medium tracking-wide">Mesin Pencari Musik YouTube</p>
+            <p class="text-xs text-slate-400 mt-2 font-medium tracking-wide">Mesin Pencari Musik AI YouTube</p>
         </div>
 
         <!-- 2. LOGIN SCREEN -->
@@ -136,7 +136,7 @@
                      class="w-9 h-9 rounded-full object-cover border-2 border-brand-500 shadow-sm">
                 <div>
                     <h1 class="text-md font-extrabold text-slate-800 leading-tight">Macenning<span class="text-brand-500">Musik</span></h1>
-                    <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">YouTube Player</p>
+                    <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">AI Player</p>
                 </div>
             </div>
             <div class="flex items-center gap-3.5">
@@ -154,11 +154,13 @@
                 <div class="absolute inset-0 flex items-center justify-center text-slate-500 text-xs z-0">Memuat video YouTube...</div>
                 <!-- Wadah Player API Resmi YouTube -->
                 <div id="youtube-player" class="w-full h-full relative z-10"></div>
+                <!-- Fallback Iframe -->
+                <iframe id="youtube-iframe" class="w-full h-full relative z-10 hidden" src="" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
             </div>
             <div class="bg-slate-900 px-4 py-3 flex justify-between items-center text-white">
                 <div class="flex items-center gap-2">
                     <i class="fa-brands fa-youtube text-red-500 text-lg"></i>
-                    <p class="text-[10px] font-bold text-slate-300">Gagal memutar video?</p>
+                    <p class="text-[10px] font-bold text-slate-300">Video tidak memutar?</p>
                 </div>
                 <div class="flex items-center gap-2">
                     <a id="btn-open-youtube" href="#" target="_blank" class="bg-red-600 hover:bg-red-700 text-white font-extrabold text-[10px] px-3 py-1.5 rounded-lg flex items-center gap-1 transition shadow">
@@ -192,7 +194,7 @@
                     <div class="flex justify-between items-center">
                         <h3 class="text-sm font-black text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
                             <span class="w-1.5 h-4 bg-brand-500 rounded-full"></span>
-                            Rekomendasi Terpopuler
+                            Baru Saja Diputar & Rekomendasi
                         </h3>
                     </div>
                     <div id="home-feed" class="grid grid-cols-1 gap-4"></div>
@@ -202,7 +204,7 @@
             <div id="tab-trending" class="tab-page hidden space-y-6">
                 <div class="flex justify-between items-center">
                     <h3 class="text-sm font-black text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-                        <span class="w-1.5 h-4 bg-red-500 rounded-full"></span> Lagu Terhangat Saat Ini
+                        <span class="w-1.5 h-4 bg-red-500 rounded-full"></span> Top Hits Musik
                     </h3>
                 </div>
                 <div id="trending-feed" class="grid grid-cols-1 gap-4"></div>
@@ -250,7 +252,7 @@
                     <div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
                         <i class="fa-brands fa-youtube text-2xl"></i>
                     </div>
-                    <p class="font-extrabold text-slate-700 text-sm">Pencarian YouTube Asli</p>
+                    <p class="font-extrabold text-slate-700 text-sm">Pencarian YouTube Real-Time</p>
                     <p class="mt-1.5 leading-relaxed text-slate-400 max-w-xs mx-auto">Ketik di atas, hasil pencarian real-time dari YouTube akan langsung bermunculan.</p>
                 </div>
             </div>
@@ -281,6 +283,15 @@
 
     <!-- SCRIPT LOGIC -->
     <script type="module">
+        // Jaminan Anti-Stuck Splash Screen
+        setTimeout(() => {
+            const splash = document.getElementById('splash-screen');
+            if (!splash.classList.contains('screen-hidden') && document.getElementById('main-header').classList.contains('hidden')) {
+                splash.classList.add('screen-hidden');
+                document.getElementById('login-screen').classList.remove('screen-hidden');
+            }
+        }, 3000);
+
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
@@ -303,7 +314,9 @@
         let userLikes = [];
         window.videoDatabase = [];
 
-        // Data awal penahan (Fallback) yang sangat aman dan selalu bisa diputar
+        // Kunci API Gemini Utama yang sudah diperbarui
+        const geminiApiKey = "AIzaSyCfyw-IxqfgHCrO3k1af0mH-MLWb0WeNog";
+
         const fastYouTubeDatabase = [
             { videoId: "HwUf_6Dsyf0", title: "ROSÉ & Bruno Mars - APT. (Official Music Video)", channel: "ROSÉ", duration: "3:24", views: "320M ditonton" },
             { videoId: "By_v9_5K8_4", title: "Bernadya - Satu Bulan (Official Lyric Video)", channel: "Bernadya", duration: "3:39", views: "45M ditonton" },
@@ -325,7 +338,7 @@
                 
                 listenToCloudDatabase();
                 loadUserLikes();
-                fetchTrendingVideos(); // Panggil video terhangat secara online otomatis!
+                fetchTrendingVideos(); 
             } else {
                 document.getElementById('splash-screen').classList.add('screen-hidden');
                 document.getElementById('login-screen').classList.remove('screen-hidden');
@@ -334,7 +347,18 @@
 
         window.handleGuestLogin = async function() {
             showToast("Menyiapkan aplikasi...", "fa-arrows-spin animate-spin");
-            try { await signInAnonymously(auth); } catch (err) { bypassSecurityForDemo(); }
+            const bypassTimer = setTimeout(() => {
+                bypassSecurityForDemo();
+                showToast("Menggunakan Mode Lokal", "fa-bolt");
+            }, 4000);
+
+            try { 
+                await signInAnonymously(auth); 
+                clearTimeout(bypassTimer);
+            } catch (err) { 
+                clearTimeout(bypassTimer);
+                bypassSecurityForDemo(); 
+            }
         };
 
         function bypassSecurityForDemo() {
@@ -349,7 +373,6 @@
             renderTrendingFeed(fastYouTubeDatabase);
         }
 
-        // KONEKSI DATABASE BERANDA REAL-TIME
         function listenToCloudDatabase() {
             if (!activeUser) return;
             const vRef = collection(db, 'artifacts', appId, 'public', 'data', 'videos');
@@ -401,11 +424,11 @@
                 if (isLiked) {
                     userLikes = userLikes.filter(id => id !== videoId);
                     await setDoc(likeDocRef, { videoIds: userLikes }, { merge: true });
-                    showToast("Dihapus dari Koleksi", "fa-heart-crack text-slate-400");
+                    showToast("Dihapus", "fa-heart-crack text-slate-400");
                 } else {
                     userLikes.push(videoId);
                     await setDoc(likeDocRef, { videoIds: userLikes }, { merge: true });
-                    showToast("Ditambahkan ke Koleksi", "fa-heart text-red-500");
+                    showToast("Ditambahkan", "fa-heart text-red-500");
                 }
             } catch (e) {
                 if (isLiked) userLikes = userLikes.filter(id => id !== videoId);
@@ -414,7 +437,6 @@
             }
         };
 
-        // RENDER HALAMAN BERANDA UTAMA
         function renderAllFeeds() {
             const homeFeed = document.getElementById('home-feed');
             if (!homeFeed) return;
@@ -452,7 +474,6 @@
             homeFeed.innerHTML = htmlString || `<p class="text-xs text-slate-400 italic text-center py-10">Belum ada video.</p>`;
         }
 
-        // RENDER HALAMAN TRENDING DINAMIS
         function renderTrendingFeed(tracks) {
             const trendingFeed = document.getElementById('trending-feed');
             if (!trendingFeed) return;
@@ -514,69 +535,54 @@
         }
 
         // =======================================================================
-        // INTEGASI PLAYER API RESMI YOUTUBE (MENGHINDARI BLOKIR EMBED / ERROR 153)
+        // INTEGASI PLAYER API RESMI YOUTUBE
         // =======================================================================
         let ytPlayer = null;
         let isAPIReady = false;
 
-        // Memuat file Library API Resmi YouTube ke dalam Website
         const tag = document.createElement('script');
         tag.src = "https://www.youtube.com/iframe_api";
         const firstScriptTag = document.getElementsByTagName('script')[0];
         firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-        // Fungsi callback otomatis saat YouTube API siap digunakan
         window.onYouTubeIframeAPIReady = function() {
             isAPIReady = true;
         };
 
-        // PEMUTAR UTAMA MENGGUNAKAN YOUTUBE NATIVE API HANDSHAKE
         window.playSelectedVideo = function(id) {
             const playerContainer = document.getElementById('player-container');
             const bypassBtn = document.getElementById('btn-open-youtube');
+            const ytPlayerDiv = document.getElementById('youtube-player');
+            const ytIframeFb = document.getElementById('youtube-iframe');
             
             playerContainer.classList.remove('hidden');
             bypassBtn.href = `https://www.youtube.com/watch?v=${id}`;
             document.getElementById('main-content').scrollTop = 0;
 
             if (isAPIReady) {
+                ytIframeFb.classList.add('hidden');
+                ytPlayerDiv.classList.remove('hidden');
+                
                 try {
-                    // Jika player sudah ada, langsung ganti video id-nya secara mulus
                     if (ytPlayer && typeof ytPlayer.loadVideoById === 'function') {
-                        ytPlayer.loadVideoById({
-                            videoId: id,
-                            suggestedQuality: 'default'
-                        });
+                        ytPlayer.loadVideoById({ videoId: id, suggestedQuality: 'default' });
                     } else {
-                        // Jika belum ada player, buat wadah player API baru
-                        const currentOrigin = window.location.origin;
                         ytPlayer = new YT.Player('youtube-player', {
                             height: '100%',
                             width: '100%',
                             videoId: id,
                             playerVars: {
-                                'autoplay': 1,
-                                'controls': 1,
-                                'rel': 0,
-                                'showinfo': 0,
-                                'modestbranding': 1,
-                                'playsinline': 1,
-                                'enablejsapi': 1,
-                                'origin': currentOrigin
+                                'autoplay': 1, 'controls': 1, 'rel': 0, 'showinfo': 0,
+                                'modestbranding': 1, 'playsinline': 1
                             },
                             events: {
-                                'onReady': function(event) {
-                                    event.target.playVideo();
-                                },
-                                'onError': function(event) {
-                                    console.warn("YouTube API error, dialihkan ke link fallback.");
-                                }
+                                'onReady': function(event) { event.target.playVideo(); },
+                                'onError': function(event) { fallbackIframeLoad(id); }
                             }
                         });
                     }
-                    showToast("Memutar Musik Resmi...", "fa-brands fa-youtube text-red-500 animate-pulse");
+                    showToast("Memutar Video...", "fa-brands fa-youtube text-red-500 animate-pulse");
                 } catch (e) {
-                    console.error("Gagal memulai Player API, memuat cadangan.", e);
                     fallbackIframeLoad(id);
                 }
             } else {
@@ -584,27 +590,28 @@
             }
         };
 
-        // Fallback jika API sedang lambat dimuat
+        // Fallback disederhanakan total agar menghilangkan Error 153
         function fallbackIframeLoad(id) {
-            const currentOrigin = window.location.origin;
-            const iframe = document.getElementById('youtube-iframe');
-            if (iframe) {
-                iframe.src = `https://www.youtube.com/embed/${id}?autoplay=1&controls=1&modestbranding=1&playsinline=1&rel=0&enablejsapi=1&origin=${encodeURIComponent(currentOrigin)}`;
-            }
-            showToast("Memuat mode alternatif...", "fa-play text-slate-400");
+            const ytPlayerDiv = document.getElementById('youtube-player');
+            const ytIframeFb = document.getElementById('youtube-iframe');
+            
+            ytPlayerDiv.classList.add('hidden');
+            ytIframeFb.classList.remove('hidden');
+            
+            // Pengaturan minim meminimalisir kemungkinan blokir WebView
+            ytIframeFb.src = `https://www.youtube.com/embed/${id}?autoplay=1&playsinline=1`;
+            showToast("Memutar Mode Alternatif...", "fa-play text-slate-400");
         }
 
         window.closePlayer = function() {
             document.getElementById('player-container').classList.add('hidden');
             if (ytPlayer && typeof ytPlayer.stopVideo === 'function') {
                 ytPlayer.stopVideo();
-            } else {
-                const iframe = document.getElementById('youtube-iframe');
-                if (iframe) iframe.src = "";
             }
+            const iframe = document.getElementById('youtube-iframe');
+            if (iframe) iframe.src = "";
         };
 
-        // Formatter angka penonton
         function formatViewsCount(views) {
             if (!views) return "Baru ditonton";
             const num = parseInt(views);
@@ -615,7 +622,7 @@
         }
 
         // =======================================================================
-        // SISTEM PENCARIAN & AUTO-TRENDING GLOBAL 100% SUKSES TANPA BLOKIR
+        // SISTEM PENCARIAN & AUTO-TRENDING PINTAR MENGGUNAKAN INDEPENDENT API
         // =======================================================================
 
         const pipedInstances = [
@@ -626,7 +633,6 @@
             "https://pipedapi.colg.one"
         ];
 
-        // Sistem Auto-Fetch Terhangat Otomatis saat Masuk Aplikasi
         async function fetchTrendingVideos() {
             let success = false;
             for (const instance of pipedInstances) {
@@ -655,15 +661,13 @@
                     success = true;
                     break;
                 } catch (e) {
-                    console.warn("Mencoba server trending cadangan...");
+                    // Coba instance lain
                 }
             }
-            if (!success) {
-                renderTrendingFeed(fastYouTubeDatabase);
-            }
+            if (!success) renderTrendingFeed(fastYouTubeDatabase);
         }
 
-        // Pencarian YouTube Asli Multipath Seketika
+        // FUNGSI UTAMA: Pencarian YouTube Menggunakan AI Gemini 2.5 dengan Google Search Grounding!
         window.executeYouTubeSearch = async function(e) {
             if (e) e.preventDefault();
             const query = document.getElementById('search-input').value.trim();
@@ -671,95 +675,101 @@
 
             const resultsBox = document.getElementById('search-results');
             
-            // Tampilan Animasi Memutar
             resultsBox.innerHTML = `
                 <div class="flex flex-col items-center justify-center mt-20 text-center">
                     <div class="w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-                    <p class="text-xs text-slate-700 font-black">Menghubungkan ke YouTube...</p>
+                    <p class="text-sm text-slate-700 font-black">AI sedang mencari lagu di YouTube...</p>
+                    <p class="text-xs text-slate-400 mt-1">Menggunakan Google Search Grounding...</p>
                 </div>`;
 
-            let success = false;
-
-            // Memindai seluruh server cermin secara paralel
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 8000);
-
-            const requests = pipedInstances.map(instance => 
-                fetch(`${instance}/search?q=${encodeURIComponent(query)}&filter=videos`, { signal: controller.signal })
-                .then(res => {
-                    if (!res.ok) throw new Error('Offline');
-                    return res.json();
-                })
-            );
-
             try {
-                const data = await Promise.any(requests);
-                controller.abort();
-                clearTimeout(timeoutId);
+                // Memanggil Gemini API dengan batas waktu 6 detik (Mencegah macet!)
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 6000);
 
-                const streams = data.filter(item => item.type === 'stream').slice(0, 15);
-                if (streams.length === 0) throw new Error();
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${geminiApiKey}`;
+                const prompt = `Temukan 6 video klip musik/lagu terpopuler di YouTube untuk pencarian: "${query}". Berikan respon hanya berupa JSON Array valid (tanpa markdown, tanpa pembungkus \`\`\`json) yang berisi objek dengan properti wajib: "videoId" (11 karakter ID video YouTube nyata, misal "By_v9_5K8_4"), "title" (judul video nyata), "channel" (nama uploader/artis), "duration" (durasi dalam format "mm:ss"), "views" (jumlah penayangan perkiraan, misal "15M ditonton"). Penting: Berikan data video nyata dan aktif dari YouTube!`;
 
-                const realTracks = streams.map(item => {
-                    const videoId = item.url.split('v=')[1] || item.url.replace('/watch?v=', '');
-                    const minutes = Math.floor(item.duration / 60);
-                    const seconds = (item.duration % 60).toString().padStart(2, '0');
-                    return {
-                        videoId: videoId,
-                        title: item.title,
-                        channel: item.uploaderName || 'Official Channel',
-                        duration: `${minutes}:${seconds}`,
-                        views: formatViewsCount(item.views)
-                    };
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }],
+                        tools: [{ "google_search": {} }], 
+                        generationConfig: { responseMimeType: "application/json" }
+                    }),
+                    signal: controller.signal
                 });
 
-                renderSearchResults(realTracks);
-                success = true;
+                clearTimeout(timeoutId);
+
+                if (!response.ok) throw new Error("Gagal menghubungi Gemini API");
+                const result = await response.json();
+                
+                const rawText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                const realTracks = JSON.parse(rawText.trim());
+
+                if (Array.isArray(realTracks) && realTracks.length > 0) {
+                    renderSearchResults(realTracks);
+                } else {
+                    throw new Error("Format hasil tidak sesuai");
+                }
 
             } catch (err) {
-                clearTimeout(timeoutId);
-                console.warn("Metode paralel gagal, menggunakan server Invidious aman...");
+                console.warn("Pencarian AI gagal, menggunakan fallback API Publik...");
                 
-                // JALUR PENYELAMAT: Cermin Invidious Engine
                 try {
-                    const invidiousRes = await fetch(`https://yewtu.be/api/v1/search?q=${encodeURIComponent(query)}&type=video`);
-                    const invidiousData = await invidiousRes.json();
-                    
-                    const videos = invidiousData.slice(0, 10);
-                    if (videos.length > 0) {
-                        const invTracks = videos.map(item => {
-                            const minutes = Math.floor(item.lengthSeconds / 60);
-                            const seconds = (item.lengthSeconds % 60).toString().padStart(2, '0');
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 6000);
+
+                    const requests = pipedInstances.slice(0, 3).map(instance => 
+                        fetch(`${instance}/search?q=${encodeURIComponent(query)}&filter=videos`, { signal: controller.signal })
+                        .then(res => res.json())
+                    );
+
+                    const data = await Promise.any(requests);
+                    clearTimeout(timeoutId);
+
+                    const streams = data.filter(item => item.type === 'stream').slice(0, 10);
+                    if (streams.length > 0) {
+                        const backupTracks = streams.map(item => {
+                            const videoId = item.url.split('v=')[1] || item.url.replace('/watch?v=', '');
+                            const minutes = Math.floor(item.duration / 60);
+                            const seconds = (item.duration % 60).toString().padStart(2, '0');
                             return {
-                                videoId: item.videoId,
+                                videoId: videoId,
                                 title: item.title,
-                                channel: item.author || 'Official Music',
+                                channel: item.uploaderName || 'Official Channel',
                                 duration: `${minutes}:${seconds}`,
-                                views: formatViewsCount(item.viewCount)
+                                views: formatViewsCount(item.views)
                             };
                         });
-                        renderSearchResults(invTracks);
-                        success = true;
+                        renderSearchResults(backupTracks);
+                    } else {
+                        throw new Error();
                     }
-                } catch (invErr) {
-                    console.error("Koneksi internet mati total.");
-                }
-            }
+                } catch (backupErr) {
+                    const queryLower = query.toLowerCase();
+                    const matched = fastYouTubeDatabase.filter(v => 
+                        v.title.toLowerCase().includes(queryLower) || v.channel.toLowerCase().includes(queryLower)
+                    );
 
-            if (!success) {
-                // Jika offline total, tampilkan pesan ramah internet mati
-                resultsBox.innerHTML = `
-                    <div class="text-center mt-16 text-slate-400 text-xs px-6">
-                        <div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
-                            <i class="fa-solid fa-wifi text-2xl"></i>
-                        </div>
-                        <p class="font-extrabold text-slate-700 text-sm">Gagal Menghubungkan</p>
-                        <p class="mt-1.5 leading-relaxed text-slate-400 max-w-xs mx-auto">Kami tidak dapat memuat video baru. Pastikan kuota data atau koneksi Wi-Fi Anda aktif dan stabil.</p>
-                    </div>`;
+                    if (matched.length > 0) {
+                        renderSearchResults(matched);
+                    } else {
+                        resultsBox.innerHTML = `
+                            <div class="text-center mt-16 text-slate-400 text-xs px-6">
+                                <div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
+                                    <i class="fa-solid fa-wifi text-2xl"></i>
+                                </div>
+                                <p class="font-extrabold text-slate-700 text-sm">Sistem Sibuk</p>
+                                <p class="mt-1.5 leading-relaxed text-slate-400 max-w-xs mx-auto">Kami tidak dapat menemukan lagu "${query}" saat ini. Sistem keamanan API sedang membatasi pencarian. Coba lagi dalam beberapa saat.</p>
+                            </div>`;
+                    }
+                }
             }
         };
 
-        // Render List Hasil Pencarian
         function renderSearchResults(tracks) {
             const resultsBox = document.getElementById('search-results');
             let html = "";
@@ -788,12 +798,10 @@
             resultsBox.innerHTML = html;
         }
 
-        // Ketika salah satu video dari list hasil pencarian diklik
         window.playSearchedVideo = async function(id, title, channel, duration, views) {
             closeSearchOverlay();
             playSelectedVideo(id);
 
-            // Simpan otomatis ke beranda utama database cloud
             try {
                 await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'videos', id), {
                     videoId: id,
@@ -803,12 +811,9 @@
                     views: views,
                     timestamp: Date.now()
                 }, { merge: true });
-            } catch (err) {
-                console.warn(err);
-            }
+            } catch (err) {}
         };
 
-        // NAVIGASI INTERAKTIF
         window.switchTab = function(tabId, btn) {
             document.querySelectorAll('.tab-page').forEach(p => p.classList.add('hidden'));
             document.querySelectorAll('#bottom-nav button').forEach(b => b.classList.remove('text-brand-500'));
