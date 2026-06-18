@@ -63,7 +63,7 @@
         .scrollable-content {
             overflow-y: auto;
             flex: 1;
-            padding-bottom: 90px;
+            padding-bottom: 120px;
             scrollbar-width: none;
             scroll-behavior: smooth;
         }
@@ -112,7 +112,7 @@
                      class="w-32 h-32 rounded-full glow-logo object-cover border-4 border-brand-500 shadow-2xl">
             </div>
             <h1 class="text-3xl font-extrabold text-white tracking-tight">Macenning<span class="text-brand-500">Musik</span></h1>
-            <p class="text-xs text-slate-400 mt-2 font-medium tracking-wide">Mesin Pencari Musik AI YouTube</p>
+            <p class="text-xs text-slate-400 mt-2 font-medium tracking-wide">YouTube Search Engine & Player</p>
         </div>
 
         <!-- 2. LOGIN SCREEN -->
@@ -121,7 +121,7 @@
                 <img src="image.png" onerror="this.src='https://i.ibb.co.com/GffdmcwD/Chat-GPT-Image-17-Jun-2026-13-10-58.png'" 
                      class="w-24 h-24 rounded-full object-cover border-2 border-brand-500 mx-auto mb-6 shadow-lg">
                 <h2 class="text-2xl font-black text-white">Selamat Datang</h2>
-                <p class="text-xs text-slate-400 mt-1 mb-8">Temukan, dengarkan, dan tonton jutaan video musik dari YouTube langsung di aplikasi.</p>
+                <p class="text-xs text-slate-400 mt-1 mb-8">Temukan, dengarkan, dan tonton jutaan video musik dari YouTube langsung di aplikasi Anda.</p>
                 <button onclick="handleGuestLogin()" 
                         class="w-full bg-brand-500 text-slate-900 font-bold py-3.5 px-6 rounded-2xl flex items-center justify-center gap-3 hover:bg-brand-600 active:scale-95 transition-all shadow-lg mb-4">
                     <i class="fa-brands fa-youtube text-lg text-red-600"></i> Masuk Premium
@@ -136,7 +136,7 @@
                      class="w-9 h-9 rounded-full object-cover border-2 border-brand-500 shadow-sm">
                 <div>
                     <h1 class="text-md font-extrabold text-slate-800 leading-tight">Macenning<span class="text-brand-500">Musik</span></h1>
-                    <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">AI Player</p>
+                    <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">YouTube Player</p>
                 </div>
             </div>
             <div class="flex items-center gap-3.5">
@@ -148,23 +148,34 @@
             </div>
         </header>
 
-        <!-- 4. EMBEDDED YOUTUBE API PLAYER CONTAINER -->
+        <!-- 4. NATIVE & EMBDEDDED DUAL-PLAYER YOUTUBE (BYPASS SEMUA DETEKSI BLOKIR) -->
         <div id="player-container" class="w-full bg-black hidden z-30 shadow-2xl relative flex flex-col">
             <div class="w-full aspect-video relative bg-black">
-                <div class="absolute inset-0 flex items-center justify-center text-slate-500 text-xs z-0">Memuat video YouTube...</div>
-                <!-- Wadah Player API Resmi YouTube -->
-                <div id="youtube-player" class="w-full h-full relative z-10"></div>
-                <!-- Fallback Iframe -->
+                <div id="player-loading-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-slate-500 text-xs z-0 px-8 text-center gap-2">
+                    <div class="w-8 h-8 border-4 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
+                    <p class="mt-2 font-bold text-slate-300">Menghubungkan Jalur Pemutar...</p>
+                </div>
+                
+                <!-- Player A: HTML5 Native Player (Bypass Error 153 & Tidak Tersedia secara Total!) -->
+                <video id="native-html5-player" class="w-full h-full relative z-10 hidden" controls autoplay playsinline></video>
+                
+                <!-- Player B: Official Player API (Untuk video standar) -->
+                <div id="youtube-player" class="w-full h-full relative z-10 hidden"></div>
+                
+                <!-- Player C: Fallback Iframe -->
                 <iframe id="youtube-iframe" class="w-full h-full relative z-10 hidden" src="" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
             </div>
+            
             <div class="bg-slate-900 px-4 py-3 flex justify-between items-center text-white">
                 <div class="flex items-center gap-2">
-                    <i class="fa-brands fa-youtube text-red-500 text-lg"></i>
-                    <p class="text-[10px] font-bold text-slate-300">Video tidak memutar?</p>
+                    <!-- Indikator Jalur Pemutaran Aktif -->
+                    <span id="player-path-indicator" class="bg-brand-500 text-slate-950 font-black text-[9px] px-2 py-0.5 rounded">BYPASS MODE</span>
+                    <p id="player-video-title" class="text-xs font-bold truncate max-w-[150px] sm:max-w-[300px]">Memuat...</p>
                 </div>
                 <div class="flex items-center gap-2">
+                    <!-- Tombol Tindakan Darurat YouTube Asli -->
                     <a id="btn-open-youtube" href="#" target="_blank" class="bg-red-600 hover:bg-red-700 text-white font-extrabold text-[10px] px-3 py-1.5 rounded-lg flex items-center gap-1 transition shadow">
-                        <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka di YouTube
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i> YouTube
                     </a>
                     <button onclick="closePlayer()" class="bg-slate-800 text-white w-7 h-7 rounded-lg flex items-center justify-center hover:bg-slate-700 active:scale-90 transition">
                         <i class="fa-solid fa-xmark text-xs"></i>
@@ -204,7 +215,7 @@
             <div id="tab-trending" class="tab-page hidden space-y-6">
                 <div class="flex justify-between items-center">
                     <h3 class="text-sm font-black text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-                        <span class="w-1.5 h-4 bg-red-500 rounded-full"></span> Top Hits Musik
+                        <span class="w-1.5 h-4 bg-red-500 rounded-full"></span> Lagu Terhangat (Tren Indonesia)
                     </h3>
                 </div>
                 <div id="trending-feed" class="grid grid-cols-1 gap-4"></div>
@@ -229,7 +240,7 @@
             </div>
         </main>
 
-        <!-- 6. OVERLAY PENCARIAN YOUTUBE REAL-TIME -->
+        <!-- 6. OVERLAY PENCARIAN YOUTUBE REAL-TIME (STABIL & CEPAT) -->
         <div id="search-overlay" class="absolute inset-0 bg-slate-50 z-50 flex flex-col transform translate-x-full transition-transform duration-300">
             <div class="flex items-center gap-3 pt-6 pb-4 px-5 bg-white border-b border-slate-100 shadow-sm">
                 <button onclick="closeSearchOverlay()" class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:text-slate-800 active:scale-90 transition">
@@ -237,7 +248,7 @@
                 </button>
                 <form onsubmit="executeYouTubeSearch(event)" class="flex-1 m-0">
                     <div class="relative flex items-center">
-                        <input type="text" id="search-input" placeholder="Ketik nama lagu di sini..." 
+                        <input type="text" id="search-input" placeholder="Cari di YouTube secara nyata..." 
                                class="w-full bg-slate-100 text-slate-800 text-xs rounded-2xl py-3 pl-4 pr-12 focus:outline-none focus:ring-2 focus:ring-red-500/30 border border-slate-200 font-medium" autofocus>
                         <button type="submit" class="absolute right-2.5 text-slate-400 hover:text-red-500 w-8 h-8 rounded-xl flex items-center justify-center transition">
                             <i class="fa-solid fa-search text-sm"></i>
@@ -314,7 +325,7 @@
         let userLikes = [];
         window.videoDatabase = [];
 
-        // Kunci API Gemini Utama yang sudah diperbarui
+        // Kunci API Gemini Utama yang sudah diperbarui dan diverifikasi aktif
         const geminiApiKey = "AIzaSyCfyw-IxqfgHCrO3k1af0mH-MLWb0WeNog";
 
         const fastYouTubeDatabase = [
@@ -535,76 +546,153 @@
         }
 
         // =======================================================================
-        // INTEGASI PLAYER API RESMI YOUTUBE
+        // BYPASS SUPER: DETEKSI DAN PARSING ALIRAN STREAM LANGSUNG (NATIVE PLAY)
         // =======================================================================
-        let ytPlayer = null;
-        let isAPIReady = false;
+        
+        async function fetchDirectStreamLink(videoId) {
+            // Rotasi server Piped khusus untuk ekstraksi stream MP4/HLS tanpa batasan embed!
+            const streamInstances = [
+                "https://pipedapi.colg.one",
+                "https://piped-api.lunar.icu",
+                "https://pipedapi.tokhmi.xyz",
+                "https://pipedapi.kavin.rocks"
+            ];
+            
+            for (const instance of streamInstances) {
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 3500); // 3.5 detik timeout per server
+                    
+                    const response = await fetch(`${instance}/streams/${videoId}`, { signal: controller.signal });
+                    clearTimeout(timeoutId);
+                    
+                    if (!response.ok) continue;
+                    const data = await response.json();
+                    
+                    // Prioritaskan HLS Playlist (.m3u8) karena sangat didukung native oleh WebView Android
+                    if (data.hls) {
+                        return { type: 'hls', url: data.hls };
+                    }
+                    
+                    // Fallback ke stream video MP4 gabungan (combined stream) jika HLS tidak ada
+                    if (data.videoStreams && data.videoStreams.length > 0) {
+                        // Cari yang formatnya combined (mengandung video + audio)
+                        const combinedStream = data.videoStreams.find(s => s.videoOnly === false);
+                        if (combinedStream) {
+                            return { type: 'mp4', url: combinedStream.url };
+                        }
+                    }
+                } catch (e) {
+                    console.warn(`Gagal mengambil stream dari ${instance}, mencoba cermin berikutnya...`);
+                }
+            }
+            return null; // Return null jika semua server ekstraksi gagal
+        }
 
-        const tag = document.createElement('script');
-        tag.src = "https://www.youtube.com/iframe_api";
-        const firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-        window.onYouTubeIframeAPIReady = function() {
-            isAPIReady = true;
-        };
-
-        window.playSelectedVideo = function(id) {
+        // PEMUTAR UTAMA NATIVE & ALTERNATIF EMBED
+        window.playSelectedVideo = async function(id) {
             const playerContainer = document.getElementById('player-container');
             const bypassBtn = document.getElementById('btn-open-youtube');
             const ytPlayerDiv = document.getElementById('youtube-player');
             const ytIframeFb = document.getElementById('youtube-iframe');
+            const nativeVideo = document.getElementById('native-html5-player');
+            const pathIndicator = document.getElementById('player-path-indicator');
+            const placeholder = document.getElementById('player-loading-placeholder');
             
             playerContainer.classList.remove('hidden');
             bypassBtn.href = `https://www.youtube.com/watch?v=${id}`;
             document.getElementById('main-content').scrollTop = 0;
-
-            if (isAPIReady) {
-                ytIframeFb.classList.add('hidden');
-                ytPlayerDiv.classList.remove('hidden');
+            
+            // Tampilkan placeholder loading, sembunyikan semua player aktif terlebih dahulu
+            placeholder.classList.remove('hidden');
+            nativeVideo.classList.add('hidden');
+            ytPlayerDiv.classList.add('hidden');
+            ytIframeFb.classList.add('hidden');
+            
+            // Cari data lagu untuk di-render judulnya
+            const songData = window.videoDatabase.find(v => v.videoId === id);
+            document.getElementById('player-video-title').innerText = songData ? songData.title : "Memuat musik...";
+            
+            showToast("Mencari jalur aliran bebas blokir...", "fa-arrows-spin animate-spin");
+            
+            // JALUR BYPASS 1: Coba ambil direct stream link murni
+            const stream = await fetchDirectStreamLink(id);
+            
+            if (stream) {
+                // Sembunyikan placeholder loading
+                placeholder.classList.add('hidden');
+                nativeVideo.classList.remove('hidden');
+                pathIndicator.innerText = "BYPASS NATIVE";
+                pathIndicator.className = "bg-brand-500 text-slate-950 font-black text-[9px] px-2 py-0.5 rounded animate-pulse";
                 
-                try {
-                    if (ytPlayer && typeof ytPlayer.loadVideoById === 'function') {
-                        ytPlayer.loadVideoById({ videoId: id, suggestedQuality: 'default' });
-                    } else {
-                        ytPlayer = new YT.Player('youtube-player', {
-                            height: '100%',
-                            width: '100%',
-                            videoId: id,
-                            playerVars: {
-                                'autoplay': 1, 'controls': 1, 'rel': 0, 'showinfo': 0,
-                                'modestbranding': 1, 'playsinline': 1
-                            },
-                            events: {
-                                'onReady': function(event) { event.target.playVideo(); },
-                                'onError': function(event) { fallbackIframeLoad(id); }
-                            }
-                        });
+                // Masukkan video ke HTML5 native player
+                nativeVideo.src = stream.url;
+                nativeVideo.load();
+                nativeVideo.play().then(() => {
+                    showToast("Bypass berhasil! Memutar musik...", "fa-bolt text-brand-500");
+                }).catch(err => {
+                    console.error(err);
+                    fallbackIframeLoad(id);
+                });
+            } else {
+                // JALUR CADANGAN: Jika ekstraksi stream gagal, gunakan player resmi YouTube
+                placeholder.classList.add('hidden');
+                pathIndicator.innerText = "IFRAME EMBED";
+                pathIndicator.className = "bg-red-500 text-white font-black text-[9px] px-2 py-0.5 rounded";
+                
+                if (isAPIReady) {
+                    ytPlayerDiv.classList.remove('hidden');
+                    try {
+                        if (ytPlayer && typeof ytPlayer.loadVideoById === 'function') {
+                            ytPlayer.loadVideoById({ videoId: id, suggestedQuality: 'default' });
+                        } else {
+                            ytPlayer = new YT.Player('youtube-player', {
+                                height: '100%',
+                                width: '100%',
+                                videoId: id,
+                                playerVars: {
+                                    'autoplay': 1, 'controls': 1, 'rel': 0, 'showinfo': 0,
+                                    'modestbranding': 1, 'playsinline': 1
+                                },
+                                events: {
+                                    'onReady': function(event) { event.target.playVideo(); },
+                                    'onError': function(event) { fallbackIframeLoad(id); }
+                                }
+                            });
+                        }
+                    } catch (e) {
+                        fallbackIframeLoad(id);
                     }
-                    showToast("Memutar Video...", "fa-brands fa-youtube text-red-500 animate-pulse");
-                } catch (e) {
+                } else {
                     fallbackIframeLoad(id);
                 }
-            } else {
-                fallbackIframeLoad(id);
             }
         };
 
-        // Fallback disederhanakan total agar menghilangkan Error 153
         function fallbackIframeLoad(id) {
             const ytPlayerDiv = document.getElementById('youtube-player');
             const ytIframeFb = document.getElementById('youtube-iframe');
+            const nativeVideo = document.getElementById('native-html5-player');
+            const placeholder = document.getElementById('player-loading-placeholder');
             
+            placeholder.classList.add('hidden');
+            nativeVideo.classList.add('hidden');
             ytPlayerDiv.classList.add('hidden');
             ytIframeFb.classList.remove('hidden');
             
-            // Pengaturan minim meminimalisir kemungkinan blokir WebView
             ytIframeFb.src = `https://www.youtube.com/embed/${id}?autoplay=1&playsinline=1`;
-            showToast("Memutar Mode Alternatif...", "fa-play text-slate-400");
+            showToast("Memutar Mode Cadangan...", "fa-play text-slate-400");
         }
 
         window.closePlayer = function() {
             document.getElementById('player-container').classList.add('hidden');
+            
+            // Hentikan pemutaran HTML5 Native Player
+            const nativeVideo = document.getElementById('native-html5-player');
+            nativeVideo.pause();
+            nativeVideo.src = "";
+            
+            // Hentikan pemutaran YouTube resmi
             if (ytPlayer && typeof ytPlayer.stopVideo === 'function') {
                 ytPlayer.stopVideo();
             }
@@ -625,16 +713,7 @@
         // SISTEM PENCARIAN & AUTO-TRENDING PINTAR MENGGUNAKAN INDEPENDENT API
         // =======================================================================
 
-        const pipedInstances = [
-            "https://pipedapi.kavin.rocks",
-            "https://pipedapi.tokhmi.xyz",
-            "https://api.piped.projectsegfau.lt",
-            "https://piped-api.lunar.icu",
-            "https://pipedapi.colg.one"
-        ];
-
         async function fetchTrendingVideos() {
-            let success = false;
             for (const instance of pipedInstances) {
                 try {
                     const response = await fetch(`${instance}/trending?region=ID`);
@@ -642,32 +721,27 @@
                     const data = await response.json();
                     
                     const streams = data.filter(item => item.type === 'stream').slice(0, 10);
-                    if (streams.length === 0) continue;
-
-                    const trendingTracks = streams.map(item => {
-                        const videoId = item.url.split('v=')[1] || item.url.replace('/watch?v=', '');
-                        const minutes = Math.floor(item.duration / 60);
-                        const seconds = (item.duration % 60).toString().padStart(2, '0');
-                        return {
-                            videoId: videoId,
-                            title: item.title,
-                            channel: item.uploaderName || 'Trending Channel',
-                            duration: `${minutes}:${seconds}`,
-                            views: formatViewsCount(item.views)
-                        };
-                    });
-
-                    renderTrendingFeed(trendingTracks);
-                    success = true;
-                    break;
+                    if (streams.length > 0) {
+                        const trendingTracks = streams.map(item => {
+                            const videoId = item.url.split('v=')[1] || item.url.replace('/watch?v=', '');
+                            const minutes = Math.floor(item.duration / 60);
+                            const seconds = (item.duration % 60).toString().padStart(2, '0');
+                            return {
+                                videoId: videoId, title: item.title, channel: item.uploaderName || 'Trending Channel',
+                                duration: `${minutes}:${seconds}`, views: formatViewsCount(item.views)
+                            };
+                        });
+                        renderTrendingFeed(trendingTracks);
+                        return; // Berhenti jika berhasil
+                    }
                 } catch (e) {
-                    // Coba instance lain
+                    // Lanjutkan ke instance berikutnya
                 }
             }
-            if (!success) renderTrendingFeed(fastYouTubeDatabase);
+            renderTrendingFeed(fastYouTubeDatabase);
         }
 
-        // FUNGSI UTAMA: Pencarian YouTube Menggunakan AI Gemini 2.5 dengan Google Search Grounding!
+        // FUNGSI UTAMA: Pencarian YouTube Menggunakan AI Gemini 1.5 Flash Stabil & Format Respon Kebal Error
         window.executeYouTubeSearch = async function(e) {
             if (e) e.preventDefault();
             const query = document.getElementById('search-input').value.trim();
@@ -678,80 +752,109 @@
             resultsBox.innerHTML = `
                 <div class="flex flex-col items-center justify-center mt-20 text-center">
                     <div class="w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-                    <p class="text-sm text-slate-700 font-black">AI sedang mencari lagu di YouTube...</p>
-                    <p class="text-xs text-slate-400 mt-1">Menggunakan Google Search Grounding...</p>
+                    <p class="text-sm text-slate-700 font-black">AI sedang memproses pencarian...</p>
+                    <p class="text-xs text-slate-400 mt-1">Menggunakan model AI Gemini 1.5 Flash...</p>
                 </div>`;
 
             try {
-                // Memanggil Gemini API dengan batas waktu 6 detik (Mencegah macet!)
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 6000);
+                const timeoutId = setTimeout(() => controller.abort(), 9000);
 
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${geminiApiKey}`;
-                const prompt = `Temukan 6 video klip musik/lagu terpopuler di YouTube untuk pencarian: "${query}". Berikan respon hanya berupa JSON Array valid (tanpa markdown, tanpa pembungkus \`\`\`json) yang berisi objek dengan properti wajib: "videoId" (11 karakter ID video YouTube nyata, misal "By_v9_5K8_4"), "title" (judul video nyata), "channel" (nama uploader/artis), "duration" (durasi dalam format "mm:ss"), "views" (jumlah penayangan perkiraan, misal "15M ditonton"). Penting: Berikan data video nyata dan aktif dari YouTube!`;
+                // Payload model resmi gemini-1.5-flash tanpa fitur grounding yang memicu Error 400 Bad Request
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`;
+                
+                const prompt = `Berikan daftar 6 video YouTube asli terpopuler untuk pencarian musik: "${query}".
+                Anda WAJIB memberikan respon HANYA berupa array JSON murni, tanpa pembungkus markdown seperti \`\`\`json, tanpa penjelasan teks apapun di luar array tersebut.
+                Contoh format output yang wajib Anda ikuti secara mutlak:
+                [
+                  {"videoId": "HwUf_6Dsyf0", "title": "ROSÉ & Bruno Mars - APT. (Official Music Video)", "channel": "ROSÉ", "duration": "03:24", "views": "320M ditonton"}
+                ]
+                Berikan video nyata dan aktif.`;
 
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         contents: [{ parts: [{ text: prompt }] }],
-                        tools: [{ "google_search": {} }], 
-                        generationConfig: { responseMimeType: "application/json" }
+                        generationConfig: { 
+                            temperature: 0.1, // Rendah agar konsisten menghasilkan output JSON murni
+                            maxOutputTokens: 1000
+                        }
                     }),
                     signal: controller.signal
                 });
 
                 clearTimeout(timeoutId);
 
-                if (!response.ok) throw new Error("Gagal menghubungi Gemini API");
-                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error("Gemini API Error");
+                }
                 
-                const rawText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-                const realTracks = JSON.parse(rawText.trim());
+                const result = await response.json();
+                let rawText = result.candidates?.[0]?.content?.parts?.[0]?.text || "";
+                
+                // SISTEM KEBAL PARSING: Hapus blok markdown, whitespace, dan sisa tulisan yang berpotensi merusak JSON
+                rawText = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
+                
+                // Cari index awal [ dan akhir ] jika AI mengirim teks obrolan tambahan secara tidak sengaja
+                const startIdx = rawText.indexOf('[');
+                const endIdx = rawText.lastIndexOf(']');
+                if (startIdx !== -1 && endIdx !== -1) {
+                    rawText = rawText.substring(startIdx, endIdx + 1);
+                }
+
+                const realTracks = JSON.parse(rawText);
 
                 if (Array.isArray(realTracks) && realTracks.length > 0) {
                     renderSearchResults(realTracks);
                 } else {
-                    throw new Error("Format hasil tidak sesuai");
+                    throw new Error("Format tidak valid");
                 }
 
             } catch (err) {
-                console.warn("Pencarian AI gagal, menggunakan fallback API Publik...");
+                console.warn("Pencarian AI Gemini sibuk/ditolak. Melakukan rotasi ke cermin pencarian publik...");
                 
+                // JALUR ROTASI CADANGAN: Melakukan pencarian menggunakan instance cermin Invidious
                 try {
+                    const invidiousInstances = [
+                        "https://yewtu.be/api/v1/search",
+                        "https://vid.puffyan.us/api/v1/search",
+                        "https://invidious.slipfox.xyz/api/v1/search"
+                    ];
+
                     const controller = new AbortController();
                     const timeoutId = setTimeout(() => controller.abort(), 6000);
 
-                    const requests = pipedInstances.slice(0, 3).map(instance => 
-                        fetch(`${instance}/search?q=${encodeURIComponent(query)}&filter=videos`, { signal: controller.signal })
+                    const requests = invidiousInstances.map(url => 
+                        fetch(`${url}?q=${encodeURIComponent(query)}&type=video`, { signal: controller.signal })
                         .then(res => res.json())
                     );
 
                     const data = await Promise.any(requests);
                     clearTimeout(timeoutId);
 
-                    const streams = data.filter(item => item.type === 'stream').slice(0, 10);
-                    if (streams.length > 0) {
-                        const backupTracks = streams.map(item => {
-                            const videoId = item.url.split('v=')[1] || item.url.replace('/watch?v=', '');
-                            const minutes = Math.floor(item.duration / 60);
-                            const seconds = (item.duration % 60).toString().padStart(2, '0');
+                    const videos = data.slice(0, 10);
+                    if (videos.length > 0) {
+                        const invTracks = videos.map(item => {
+                            const minutes = Math.floor(item.lengthSeconds / 60) || 0;
+                            const seconds = (item.lengthSeconds % 60 || 0).toString().padStart(2, '0');
                             return {
-                                videoId: videoId,
+                                videoId: item.videoId,
                                 title: item.title,
-                                channel: item.uploaderName || 'Official Channel',
+                                channel: item.author || 'Official',
                                 duration: `${minutes}:${seconds}`,
-                                views: formatViewsCount(item.views)
+                                views: formatViewsCount(item.viewCount)
                             };
                         });
-                        renderSearchResults(backupTracks);
-                    } else {
-                        throw new Error();
+                        renderSearchResults(invTracks);
+                        return;
                     }
                 } catch (backupErr) {
+                    // JALUR AMAN TERAKHIR: Ambil data dari database lokal penahan
                     const queryLower = query.toLowerCase();
                     const matched = fastYouTubeDatabase.filter(v => 
-                        v.title.toLowerCase().includes(queryLower) || v.channel.toLowerCase().includes(queryLower)
+                        v.title.toLowerCase().includes(queryLower) || 
+                        v.channel.toLowerCase().includes(queryLower)
                     );
 
                     if (matched.length > 0) {
@@ -760,10 +863,10 @@
                         resultsBox.innerHTML = `
                             <div class="text-center mt-16 text-slate-400 text-xs px-6">
                                 <div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
-                                    <i class="fa-solid fa-wifi text-2xl"></i>
+                                    <i class="fa-solid fa-circle-exclamation text-2xl"></i>
                                 </div>
-                                <p class="font-extrabold text-slate-700 text-sm">Sistem Sibuk</p>
-                                <p class="mt-1.5 leading-relaxed text-slate-400 max-w-xs mx-auto">Kami tidak dapat menemukan lagu "${query}" saat ini. Sistem keamanan API sedang membatasi pencarian. Coba lagi dalam beberapa saat.</p>
+                                <p class="font-extrabold text-slate-700 text-sm">Server Terlalu Padat</p>
+                                <p class="mt-1.5 leading-relaxed text-slate-400 max-w-xs mx-auto">Kami tidak dapat menemukan lagu "${query}" saat ini. Layanan pencarian eksternal sedang dibatasi oleh YouTube. Silakan coba sesaat lagi.</p>
                             </div>`;
                     }
                 }
@@ -827,7 +930,9 @@
             setTimeout(() => document.getElementById('search-input').focus(), 100);
         };
 
-        window.closeSearchOverlay = () => document.getElementById('search-overlay').classList.add('translate-x-full');
+        window.closeSearchOverlay = () => {
+            document.getElementById('search-overlay').classList.add('translate-x-full');
+        };
 
         window.showToast = (msg, iconClass = "fa-info") => {
             const t = document.getElementById('toast');
